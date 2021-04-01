@@ -1,5 +1,7 @@
+import 'package:expenses/Components/adaptative_button.dart';
+import 'package:expenses/Components/adaptative_date_picker.dart';
+import 'package:expenses/Components/adaptative_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class TransactionForm extends StatefulWidget {
   final void Function(String, double, DateTime) onSubmit;
@@ -28,82 +30,47 @@ class _TransactionFormState extends State<TransactionForm> {
     widget.onSubmit(title, value, _selectedDate);
   }
 
-  _showDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2021),
-      lastDate: DateTime.now(),
-    ).then((pickedDate){
-      if(pickedDate == null) {
-        return null;
-      }
-      
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _titleController,
-              onSubmitted: (value) => _submitForm(),
-              decoration: InputDecoration(labelText: 'Titulo'),
-            ),
-            TextField(
-              controller: _valueController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              onSubmitted: (value) => _submitForm(),
-              decoration: InputDecoration(labelText: 'Valor'),
-            ),
-            Container(
-              height: 70,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    _selectedDate == null ? 'Nenhuma data selecionada' : 'Data: ${DateFormat('dd/MM/y').format(_selectedDate)}',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  TextButton(
-                    child: Text(
-                      'Selecionar Data',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: _showDatePicker,
-                  )
-                ],
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: <Widget>[
+              AdaptativeTextField(
+                controller: _titleController,
+                onSubmitted: (value) => _submitForm(),
+                label: 'Titulo',
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  child: Text(
-                    'Nova Transação',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+              AdaptativeTextField(
+                controller: _valueController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                onSubmitted: (value) => _submitForm(),
+                label: 'Valor (R\$)',
+              ),
+              AdaptativeDatePicker(
+                selectedDate: _selectedDate,
+                onDateChanged: (newDate) => {
+                  setState(() {
+                    _selectedDate = newDate;
+                  })
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AdapativeButton(
+                    label: 'Nova Transação',
+                    onPressed: _submitForm,
                   ),
-                  onPressed: _submitForm,
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
-      elevation: 5,
     );
   }
 }
